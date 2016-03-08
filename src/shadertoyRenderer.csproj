@@ -44,29 +44,32 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\OpenTK.GLControl.dll</HintPath>
     </Reference>
-    <Reference Include="SlimDX" />
+    <Reference Include="SlimDX">
+      <HintPath>..\..\..\..\..\..\vvvv\vvvv_45beta33.7_x86\lib\core\SlimDX.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition.CodePlex">
-      <HintPath>..\..\..\..\..\vvvv\vvvv_45beta34.1_x86\lib\core\System.ComponentModel.Composition.CodePlex.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\vvvv\vvvv_45beta33.7_x86\lib\core\System.ComponentModel.Composition.CodePlex.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="VVVV.Core">
-      <HintPath>..\..\..\..\..\vvvv\vvvv_45beta34.1_x86\lib\core\VVVV.Core.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\vvvv\vvvv_45beta33.7_x86\lib\core\VVVV.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="VVVV.PluginInterfaces">
-      <HintPath>..\..\..\..\..\vvvv\vvvv_45beta34.1_x86\lib\core\VVVV.PluginInterfaces.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\vvvv\vvvv_45beta33.7_x86\lib\core\VVVV.PluginInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="VVVV.Utils">
-      <HintPath>..\..\..\..\..\vvvv\vvvv_45beta34.1_x86\lib\core\VVVV.Utils.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\vvvv\vvvv_45beta33.7_x86\lib\core\VVVV.Utils.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="VVVV.Utils3rdParty">
-      <HintPath>..\..\..\..\..\vvvv\vvvv_45beta34.1_x86\lib\core\VVVV.Utils3rdParty.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\vvvv\vvvv_45beta33.7_x86\lib\core\VVVV.Utils3rdParty.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
