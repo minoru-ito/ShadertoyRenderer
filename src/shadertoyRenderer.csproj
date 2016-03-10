@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <OutputType>Library</OutputType>
     <RootNamespace>VVVV.Nodes</RootNamespace>
-    <AssemblyName>shadertoyRenderer</AssemblyName>
+    <AssemblyName>DX11.shadertoyRenderer</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -38,6 +38,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <Prefer32Bit>false</Prefer32Bit>
+    <OutputPath>bin\dx11\AnyCPU\Debug\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <Prefer32Bit>false</Prefer32Bit>
@@ -47,6 +48,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <Prefer32Bit>false</Prefer32Bit>
+    <OutputPath>bin\dx11\AnyCPU\Release\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <Prefer32Bit>false</Prefer32Bit>
@@ -61,11 +63,11 @@
     </Reference>
     <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\OpenTK.dll</HintPath>
+      <HintPath>..\dependences\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK.GLControl, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\OpenTK.GLControl.dll</HintPath>
+      <HintPath>..\dependences\OpenTK.GLControl.dll</HintPath>
     </Reference>
     <Reference Include="SlimDX">
       <HintPath>..\..\..\..\..\..\vvvv\vvvv_45beta33.7_x86\lib\core\SlimDX.dll</HintPath>
