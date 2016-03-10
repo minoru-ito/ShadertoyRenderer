@@ -19,9 +19,10 @@ using VVVV.Core.Logging;
 using FeralTic.DX11;
 using FeralTic.DX11.Resources;
 
-//using SlimDX;
+using SlimDX;
 //using SlimDX.Direct3D9;
 using SlimDX.DXGI;
+using SlimDX.Direct3D11;
 
 using OpenTK;
 using OpenTK.Graphics;
@@ -81,6 +82,7 @@ namespace VVVV.DX11.Nodes
             // texture for vvvv
             int width, height;
             byte[] pixelBuffer, flippedBuffer;
+            int channels = 4;
 
             // mouse pos
             int mouseX, mouseY, clickX, clickY;
@@ -283,6 +285,12 @@ namespace VVVV.DX11.Nodes
                 //FLogger.Log(LogType.Message, "OnResize");
 
                 glControl.Size = this.Size;
+
+                this.width = glControl.Size.Width;
+                this.height = glControl.Size.Height;
+                pixelBuffer = new byte[this.width * this.height * channels];
+                flippedBuffer = new byte[pixelBuffer.Length];
+
                 setupViewport();
                 resized = true;
             }
@@ -557,47 +565,70 @@ void main(void){
             // ======================================================
             unsafe public void Update(IPluginIO pin, DX11RenderContext context)
             {
-                if (FOutTexture.SliceCount == 0)
+                if (FOutTexture.SliceCount == 0 || glControl.Size.Width == 0 || glControl.Size.Height == 0)
                 {
                     return;
                 }
 
-                if (!FOutTexture[0].Contains(context))
+                if (this.invalidate || !FOutTexture[0].Contains(context))
                 {
-                    Format format;
+                    Format format = Format.R8G8B8A8_UNorm;
+                    Texture2DDescription desc;
 
-                    this.width = glControl.Size.Width;
-                    this.height = glControl.Size.Height;
-                    pixelBuffer = new byte[this.width * this.height * 4];
-                    flippedBuffer = new byte[pixelBuffer.Length];
+                    //this.width = glControl.Size.Width;
+                    //this.height = glControl.Size.Height;
+                    //pixelBuffer = new byte[this.width * this.height * channels];
+                    //flippedBuffer = new byte[pixelBuffer.Length];
 
-                    format = Format.R8G8B8A8_UNorm;
-
-                    FOutTexture[0][context] = new DX11DynamicTexture2D(context, this.width, this.height, format);
-                }
-
-                if (this.invalidate)
-                {
-                    // GL.getPixels results is flipped vertically
-                    // 4 means rgba
-                    for (int i = 0; i < this.width * this.height; i++)
+                    if (FOutTexture[0].Contains(context))
                     {
-                        int rowIndex = (this.height - 1) - (i / this.width);
-                        //if (rowIndex < 0) rowIndex = 0;
-                        //if (rowIndex > this.height - 1) rowIndex = this.height - 1;
-                        int colIndex = i % this.width;
-                        int index = ((rowIndex * this.width) + colIndex) * 4;
-
-                        flippedBuffer[i * 4] = pixelBuffer[index];
-                        flippedBuffer[i * 4 + 1] = pixelBuffer[index + 1];
-                        flippedBuffer[i * 4 + 2] = pixelBuffer[index + 2];
-                        flippedBuffer[i * 4 + 3] = pixelBuffer[index + 3];
+                        desc = FOutTexture[0][context].Resource.Description;
+                        if (desc.Width != this.width || desc.Height != this.height || desc.Format != format)
+                        {
+                            FOutTexture[0].Dispose(context);
+                            FOutTexture[0][context] = new DX11DynamicTexture2D(context, this.width, this.height, format);
+                        }
+                    }
+                    else
+                    {
+                        FOutTexture[0][context] = new DX11DynamicTexture2D(context, this.width, this.height, format);
                     }
 
+                    desc = FOutTexture[0][context].Resource.Description;
+
+                    // GL.getPixels results is flipped vertically, so fix it
+                    int rowIndex, colIndex, srcIndex, dstIndex;
+                    for (int i = 0; i < this.width * this.height; i++)
+                    {
+                        rowIndex = (this.height - 1) - (i / this.width);
+                        colIndex = i % this.width;
+                        srcIndex = ((rowIndex * this.width) + colIndex) * channels;
+                        dstIndex = i * channels;
+
+                        flippedBuffer[dstIndex] = pixelBuffer[srcIndex];
+                        flippedBuffer[dstIndex + 1] = pixelBuffer[srcIndex + 1];
+                        flippedBuffer[dstIndex + 2] = pixelBuffer[srcIndex + 2];
+                        flippedBuffer[dstIndex + 3] = pixelBuffer[srcIndex + 3];
+                    }
+
+                    //int stride = channels;
                     var t = FOutTexture[0][context];
-                    t.WriteData(flippedBuffer);
+                    //t.WriteData(flippedBuffer);
                     //t.WriteData(pixelBuffer);
-                    
+
+                    fixed (byte* b_ptr = &flippedBuffer[0])
+                    {
+                        IntPtr ptr = new IntPtr(b_ptr);
+                        if (t.GetRowPitch() == desc.Width * channels)
+                        {
+                            t.WriteData(ptr, desc.Width * desc.Height * channels);
+                        }
+                        else
+                        {
+                            t.WriteDataPitch(ptr, desc.Width * desc.Height * channels, channels);
+                        }
+                    }
+
                     this.invalidate = false;
                 }
             }
