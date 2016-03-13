@@ -85,7 +85,13 @@ namespace VVVV.DX11.Nodes
             int channels = 4;
 
             // mouse pos
-            int mouseX, mouseY, clickX, clickY;
+            int dragX, dragY, clickX, clickY;
+
+            // frame counter
+            int frames;
+
+            // frame sec
+            double frameTimeDelay;
 
             // flag
             bool initialized = false;
@@ -241,6 +247,8 @@ namespace VVVV.DX11.Nodes
 
             void glControl_Disposed(object sender, EventArgs e)
             {
+                glControl.MakeCurrent();
+
                 for (int i = 0; i < 4; i++)
                 {
                     if (tex[i] != -1)
@@ -263,19 +271,24 @@ namespace VVVV.DX11.Nodes
             void glControl_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
             {
                 clickX = e.X;
-                clickY = e.Y;
+                clickY = glControl.Height - e.Y;    // reverse y
             }
 
             void glControl_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
             {
-                mouseX = e.X;
-                mouseY = e.Y;
+                // update only when pressed any button
+                if (e.Button != MouseButtons.None)
+                {
+                    dragX = e.X;
+                    dragY = glControl.Height - e.Y; // reverse y
+                }
             }
 
             void glControl_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
             {
-                clickX = -9999;
-                clickY = -9999;
+                // reset to 0
+                clickX = 0;
+                clickY = 0;
             }
 
             #endregion GLControl events
@@ -297,6 +310,8 @@ namespace VVVV.DX11.Nodes
 
             void setupViewport()
             {
+                glControl.MakeCurrent();
+
                 int w = glControl.Width;
                 int h = glControl.Height;
                 GL.MatrixMode(MatrixMode.Projection);
@@ -309,6 +324,15 @@ namespace VVVV.DX11.Nodes
             {
                 if (FInFragmentShader.SliceCount == 0)
                     return;
+
+                // for multiple instance
+                glControl.MakeCurrent();
+
+                // reset framr counter
+                frames = 0;
+
+                // reset frametimedelay
+                frameTimeDelay = FHDEHost.FrameTime;
 
                 //GL.ClearColor(Color4.Black);
                 setupViewport();
@@ -511,7 +535,13 @@ void main(void){
 
                 GL.Uniform3(GL.GetUniformLocation(shaderProgram, "iResolution"), (float)ClientSize.Width, (float)ClientSize.Height, 0.0f);
                 GL.Uniform1(GL.GetUniformLocation(shaderProgram, "iGlobalTime"), (float)FHDEHost.FrameTime);
-                GL.Uniform4(GL.GetUniformLocation(shaderProgram, "iMouse"), (float)mouseX, (float)mouseY, (float)clickX, (float)clickY);
+                GL.Uniform1(GL.GetUniformLocation(shaderProgram, "iTimeDelta"), (float)(FHDEHost.FrameTime - frameTimeDelay));
+                // store to next frame
+                frameTimeDelay = FHDEHost.FrameTime;
+                GL.Uniform1(GL.GetUniformLocation(shaderProgram, "iFrame"), frames++);
+                GL.Uniform4(GL.GetUniformLocation(shaderProgram, "iMouse"), (float)dragX, (float)dragY, (float)clickX, (float)clickY);
+                DateTime now = DateTime.Now;
+                GL.Uniform4(GL.GetUniformLocation(shaderProgram, "iDate"), now.Year, now.Month, now.Day, now.TimeOfDay.TotalSeconds);
 
                 /*
                 for(int i=0; i<4; i++)
