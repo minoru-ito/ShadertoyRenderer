@@ -36,7 +36,7 @@ namespace VVVV.DX11.Nodes
         #region PluginInfo
         [PluginInfo(Name = "Renderer", Category = "shadertoy", Version = "DX11", AutoEvaluate = true)]
         #endregion PluginInfo
-        public class shadertoyRendererNode : UserControl, IPluginEvaluate, IPartImportsSatisfiedNotification, IDX11ResourceProvider, IDisposable
+        public class shadertoyRendererNode : UserControl, IPluginEvaluate, IPartImportsSatisfiedNotification, IDX11ResourceHost, IDisposable
         {
             #region fields & pins
 
@@ -593,7 +593,7 @@ void main(void){
             // ======================================================
             // dx11
             // ======================================================
-            unsafe public void Update(IPluginIO pin, DX11RenderContext context)
+            unsafe public void Update(DX11RenderContext context)
             {
                 if (FOutTexture.SliceCount == 0 || glControl.Size.Width == 0 || glControl.Size.Height == 0)
                 {
@@ -664,7 +664,7 @@ void main(void){
             }
 
             // call when disconnect from renderer
-            public void Destroy(IPluginIO pin, DX11RenderContext context, bool force)
+            public void Destroy(DX11RenderContext context, bool force)
             {
                 FOutTexture[0].Dispose(context);
             }
