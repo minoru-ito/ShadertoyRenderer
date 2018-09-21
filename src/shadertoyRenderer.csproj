@@ -6,11 +6,12 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <OutputType>Library</OutputType>
     <RootNamespace>VVVV.Nodes</RootNamespace>
-    <AssemblyName>shadertoyRenderer</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <AssemblyName>DX11.shadertoyRenderer</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <ReferencePath>..\..\..\..\vvvv\vvvv_45beta34.1_x64\lib\core\;..\..\..\..\vvvv\vvvv_45beta34.1_x64\lib\nodes\plugins\</ReferencePath>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
@@ -35,38 +36,73 @@
   <PropertyGroup Condition=" '$(Platform)' == 'x64' ">
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <Prefer32Bit>false</Prefer32Bit>
+    <OutputPath>bin\dx11\AnyCPU\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <Prefer32Bit>false</Prefer32Bit>
+    <OutputPath>bin\dx11\AnyCPU\Release\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FeralTic">
+      <HintPath>..\..\..\..\..\..\vvvv\vvvv_45beta33.7_x86\packs\dx11\core\FeralTic.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\OpenTK.dll</HintPath>
+      <HintPath>..\dependences\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK.GLControl, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\OpenTK.GLControl.dll</HintPath>
+      <HintPath>..\dependences\OpenTK.GLControl.dll</HintPath>
     </Reference>
-    <Reference Include="SlimDX" />
+    <Reference Include="SlimDX">
+      <HintPath>..\..\..\..\..\..\vvvv\vvvv_45beta33.7_x86\lib\core\SlimDX.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition.CodePlex">
-      <HintPath>..\..\..\..\..\vvvv\vvvv_45beta34.1_x86\lib\core\System.ComponentModel.Composition.CodePlex.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\vvvv\vvvv_45beta33.7_x86\lib\core\System.ComponentModel.Composition.CodePlex.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="VVVV.Core">
-      <HintPath>..\..\..\..\..\vvvv\vvvv_45beta34.1_x86\lib\core\VVVV.Core.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\vvvv\vvvv_45beta33.7_x86\lib\core\VVVV.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="VVVV.DX11.Core">
+      <HintPath>..\..\..\..\..\..\vvvv\vvvv_45beta33.7_x86\packs\dx11\core\VVVV.DX11.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="VVVV.DX11.Lib">
+      <HintPath>..\..\..\..\..\..\vvvv\vvvv_45beta33.7_x86\packs\dx11\core\VVVV.DX11.Lib.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="VVVV.PluginInterfaces">
-      <HintPath>..\..\..\..\..\vvvv\vvvv_45beta34.1_x86\lib\core\VVVV.PluginInterfaces.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\vvvv\vvvv_45beta33.7_x86\lib\core\VVVV.PluginInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="VVVV.Utils">
-      <HintPath>..\..\..\..\..\vvvv\vvvv_45beta34.1_x86\lib\core\VVVV.Utils.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\vvvv\vvvv_45beta33.7_x86\lib\core\VVVV.Utils.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="VVVV.Utils3rdParty">
-      <HintPath>..\..\..\..\..\vvvv\vvvv_45beta34.1_x86\lib\core\VVVV.Utils3rdParty.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\vvvv\vvvv_45beta33.7_x86\lib\core\VVVV.Utils3rdParty.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
