@@ -217,3 +217,5 @@ pip-log.txt
 .mr.developer.cfg
 src/Properties/AssemblyInfo.cs
 zip/
+src/.vs/
+src/packages/
