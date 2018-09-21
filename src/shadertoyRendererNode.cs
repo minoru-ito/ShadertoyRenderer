@@ -362,7 +362,7 @@ void main(void){
                 fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
                 string fsUniform = @"
 uniform vec3      iResolution;           // viewport resolution (in pixels)
-uniform float     iGlobalTime;           // shader playback time (in seconds)
+uniform float     iTime;           // shader playback time (in seconds)
 uniform float     iTimeDelta;            // render time (in seconds)
 uniform int       iFrame;                // shader playback frame
 uniform float     iChannelTime[4];       // channel playback time (in seconds)
@@ -522,7 +522,7 @@ void main(void){
 
                 /*
                 uniform vec3      iResolution;           // viewport resolution (in pixels)
-                uniform float     iGlobalTime;           // shader playback time (in seconds)
+                uniform float     iTime;           // shader playback time (in seconds)
                 uniform float     iTimeDelta;            // render time (in seconds)
                 uniform int       iFrame;                // shader playback frame
                 uniform float     iChannelTime[4];       // channel playback time (in seconds)
@@ -534,7 +534,7 @@ void main(void){
                 */
 
                 GL.Uniform3(GL.GetUniformLocation(shaderProgram, "iResolution"), (float)ClientSize.Width, (float)ClientSize.Height, 0.0f);
-                GL.Uniform1(GL.GetUniformLocation(shaderProgram, "iGlobalTime"), (float)FHDEHost.FrameTime);
+                GL.Uniform1(GL.GetUniformLocation(shaderProgram, "iTime"), (float)FHDEHost.FrameTime);
                 GL.Uniform1(GL.GetUniformLocation(shaderProgram, "iTimeDelta"), (float)(FHDEHost.FrameTime - frameTimeDelay));
                 // store to next frame
                 frameTimeDelay = FHDEHost.FrameTime;
