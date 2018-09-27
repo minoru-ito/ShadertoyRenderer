@@ -10,41 +10,41 @@ using System.Runtime.InteropServices;
 
 using VVVV.PluginInterfaces.V1;
 using VVVV.PluginInterfaces.V2;
-//using VVVV.PluginInterfaces.V2.EX9;
+using VVVV.PluginInterfaces.V2.EX9;
 using VVVV.Utils.VColor;
 using VVVV.Utils.VMath;
-//using VVVV.Utils.SlimDX;
+using VVVV.Utils.SlimDX;
 using VVVV.Core.Logging;
 
 using FeralTic.DX11;
 using FeralTic.DX11.Resources;
 
 using SlimDX;
-//using SlimDX.Direct3D9;
-using SlimDX.DXGI;
-using SlimDX.Direct3D11;
+using SlimDX.Direct3D9;
+//using SlimDX.DXGI;
+//using SlimDX.Direct3D11;
 
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 #endregion usings
 
-namespace VVVV.DX11.Nodes
+namespace VVVV.Nodes
 {
     namespace shadertoy
     {
         #region PluginInfo
-        [PluginInfo(Name = "Renderer", Category = "shadertoy", Version = "DX11 FileTexture", AutoEvaluate = true)]
+        [PluginInfo(Name = "Renderer", Category = "shadertoy", Version = "DX9 FileTexture", AutoEvaluate = true)]
         #endregion PluginInfo
-        public class shadertoyRendererNode : UserControl, IPluginEvaluate, IPartImportsSatisfiedNotification, IDX11ResourceHost, IDisposable
+        public class shadertoyRendererDX9Node : UserControl, IPluginEvaluate, IPartImportsSatisfiedNotification
         {
             #region fields & pins
 
-            //public class Info
-            //{
-            //    public int Width;
-            //    public int Height;
-            //}
+            public class Info
+            {
+                public int Width;
+                public int Height;
+            }
 
             [Input("Play")]
             public ISpread<bool> FInPlay;
@@ -56,8 +56,7 @@ namespace VVVV.DX11.Nodes
             public IDiffSpread<string> FInFilename;
 
             [Output("Texture Out")]
-            public ISpread<DX11Resource<DX11DynamicTexture2D>> FOutTexture;
-            //public ISpread<TextureResource<Info>> FOutTexture;
+            public ISpread<TextureResource<Info>> FOutTexture;
 
             [Output("Log")]
             public ISpread<string> FOutLog;
@@ -103,7 +102,7 @@ namespace VVVV.DX11.Nodes
 
             #region constructor and init
 
-            public shadertoyRendererNode()
+            public shadertoyRendererDX9Node()
             {
                 //
             }
@@ -113,7 +112,7 @@ namespace VVVV.DX11.Nodes
                 initialized = false;
                 resized = false;
 
-                //FOutTexture.SliceCount = 0;
+                FOutTexture.SliceCount = 0;
 
                 //setup the gui
                 InitializeComponent();
@@ -151,72 +150,29 @@ namespace VVVV.DX11.Nodes
 
             #endregion constructor and init
 
-            #region dispose
-            public void Dispose()
-            {
-                Dispose(true);
-            }
-
-            private void Dispose(bool disposing)
-            {
-                if(disposing)
-                {
-                    if(!disposed)
-                    {
-                        disposed = true;
-
-                        if(FOutTexture.SliceCount > 0)
-                        {
-                            if (FOutTexture[0] != null)
-                                FOutTexture[0].Dispose();
-                        }
-                    }
-                }
-            }
-            #endregion
-
             //called when data for any output pin is requested
             public void Evaluate(int SpreadMax)
             {
                 //FLogger.Log(LogType.Debug, FHDEHost.FrameTime.ToString() + "," + FHDEHost.RealTime.ToString());
 
-                if (FOutTexture[0] == null)
-                    FOutTexture[0] = new DX11Resource<DX11DynamicTexture2D>();
-
-                //FOutTexture.ResizeAndDispose(1, CreateTextureResource);
-                //var textureResource = FOutTexture[0];
-                //var info = textureResource.Metadata;
+                FOutTexture.ResizeAndDispose(1, CreateTextureResource);
+                var textureResource = FOutTexture[0];
+                var info = textureResource.Metadata;
 
                 if (!initialized || FInFragmentShader.IsChanged || FInFilename.IsChanged)
                 {
-                    // recreate texture
-                    if(FOutTexture[0] != null)
-                    {
-                        FOutTexture[0].Dispose();
-                        FOutTexture[0] = null;
-                        FOutTexture[0] = new DX11Resource<DX11DynamicTexture2D>();
-                    }
-
-                    //textureResource.Dispose();
-                    //textureResource = CreateTextureResource();
-                    //info = textureResource.Metadata;
+                    textureResource.Dispose();
+                    textureResource = CreateTextureResource();
+                    info = textureResource.Metadata;
 
                     Init();
                 }
 
                 if (resized)
                 {
-                    // recreate texture
-                    if (FOutTexture[0] != null)
-                    {
-                        FOutTexture[0].Dispose();
-                        FOutTexture[0] = null;
-                        FOutTexture[0] = new DX11Resource<DX11DynamicTexture2D>();
-                    }
-
-                    //textureResource.Dispose();
-                    //textureResource = CreateTextureResource();
-                    //info = textureResource.Metadata;
+                    textureResource.Dispose();
+                    textureResource = CreateTextureResource();
+                    info = textureResource.Metadata;
 
                     resized = false;
                 }
@@ -224,7 +180,7 @@ namespace VVVV.DX11.Nodes
                 if (shaderProgram > 0 && FInPlay[0])
                     Render();
 
-                //FOutTexture[0] = textureResource;
+                FOutTexture[0] = textureResource;
             }
 
             #region GLControl events
@@ -591,89 +547,8 @@ void main(void){
 
 
             // ======================================================
-            // dx11
-            // ======================================================
-            unsafe public void Update(DX11RenderContext context)
-            {
-                if (FOutTexture.SliceCount == 0 || glControl.Size.Width == 0 || glControl.Size.Height == 0)
-                {
-                    return;
-                }
-
-                if (this.invalidate || !FOutTexture[0].Contains(context))
-                {
-                    Format format = Format.R8G8B8A8_UNorm;
-                    Texture2DDescription desc;
-
-                    //this.width = glControl.Size.Width;
-                    //this.height = glControl.Size.Height;
-                    //pixelBuffer = new byte[this.width * this.height * channels];
-                    //flippedBuffer = new byte[pixelBuffer.Length];
-
-                    if (FOutTexture[0].Contains(context))
-                    {
-                        desc = FOutTexture[0][context].Resource.Description;
-                        if (desc.Width != this.width || desc.Height != this.height || desc.Format != format)
-                        {
-                            FOutTexture[0].Dispose(context);
-                            FOutTexture[0][context] = new DX11DynamicTexture2D(context, this.width, this.height, format);
-                        }
-                    }
-                    else
-                    {
-                        FOutTexture[0][context] = new DX11DynamicTexture2D(context, this.width, this.height, format);
-                    }
-
-                    desc = FOutTexture[0][context].Resource.Description;
-
-                    // GL.getPixels results is flipped vertically, so fix it
-                    int rowIndex, colIndex, srcIndex, dstIndex;
-                    for (int i = 0; i < this.width * this.height; i++)
-                    {
-                        rowIndex = (this.height - 1) - (i / this.width);
-                        colIndex = i % this.width;
-                        srcIndex = ((rowIndex * this.width) + colIndex) * channels;
-                        dstIndex = i * channels;
-
-                        flippedBuffer[dstIndex] = pixelBuffer[srcIndex];
-                        flippedBuffer[dstIndex + 1] = pixelBuffer[srcIndex + 1];
-                        flippedBuffer[dstIndex + 2] = pixelBuffer[srcIndex + 2];
-                        flippedBuffer[dstIndex + 3] = pixelBuffer[srcIndex + 3];
-                    }
-
-                    //int stride = channels;
-                    var t = FOutTexture[0][context];
-                    //t.WriteData(flippedBuffer);
-                    //t.WriteData(pixelBuffer);
-
-                    fixed (byte* b_ptr = &flippedBuffer[0])
-                    {
-                        IntPtr ptr = new IntPtr(b_ptr);
-                        if (t.GetRowPitch() == desc.Width * channels)
-                        {
-                            t.WriteData(ptr, desc.Width * desc.Height * channels);
-                        }
-                        else
-                        {
-                            t.WriteDataPitch(ptr, desc.Width * desc.Height * channels, channels);
-                        }
-                    }
-
-                    this.invalidate = false;
-                }
-            }
-
-            // call when disconnect from renderer
-            public void Destroy(DX11RenderContext context, bool force)
-            {
-                FOutTexture[0].Dispose(context);
-            }
-
-
-            // ======================================================
             // dx9
             // ======================================================
-            /*
             TextureResource<Info> CreateTextureResource()
             {
                 //FLogger.Log(LogType.Debug, "CreateTextureResource()");
@@ -725,7 +600,6 @@ void main(void){
                 //copy pixel into texture
                 TextureUtils.SetPtrVal2D(data, pixel, row, col, width);
             }
-            */
         }
     }
 }

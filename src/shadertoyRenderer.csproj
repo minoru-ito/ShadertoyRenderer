@@ -110,6 +110,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="shadertoyRendererDX9Node.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="shadertoyRendererNode.cs">
       <SubType>UserControl</SubType>
     </Compile>
